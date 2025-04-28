@@ -1,0 +1,8 @@
+# maps Client SSL profiles to corresponding SSL certificates and keys
+client_ssl_profiles:
+  ansible-foo:
+    key: foo.example.com-key.pem
+    cert: foo.example.com.pem
+  ansible-bar:
+    key: bar.example.com-key.pem
+    cert: bar.example.com.pem

@@ -1,0 +1,5 @@
+certs/
+inventory/host_vars/*
+!inventory/host_vars/bigip.test
+inventory/*.ini
+!inventory/inventory.ini

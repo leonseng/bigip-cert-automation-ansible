@@ -1,0 +1,5 @@
+# BIG-IP host variables
+ansible_host: bigip.test
+ansible_user: admin
+ansible_password: password
+api_port: 443

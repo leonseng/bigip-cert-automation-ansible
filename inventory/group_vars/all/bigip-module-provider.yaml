@@ -1,0 +1,9 @@
+ansible_connection: httpapi
+ansible_network_os: f5networks.f5_modules.bigip
+bigip_module_provider:
+  server: "{{ ansible_host }}"
+  server_port: "{{ api_port }}"
+  user: "{{ ansible_user }}"
+  password: "{{ ansible_password }}"
+  validate_certs: no
+  no_f5_teem: true
