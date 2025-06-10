@@ -13,7 +13,7 @@
       #       "cert_pem": "LS0tLS1CRUdJ...",
       #       "key_pem": "LS0tLS1CRUdJ...",
       #       "profile_name": "ansible-foo",
-      #       "ssl_object_name": "ansible-foo-228fa379c1bd157b63fbdb29d8bb5f58"
+      #       "ssl_object_name": "ansible-foo-228fa379c1bd157b63fbdb29d8bb5f58"  # suffixed with hash of key and cert
       #   }, ...
       # ]
       set_fact:
@@ -64,6 +64,7 @@
         warn: false  # ignore non-idempotent warning
 
     - name: Save changes
+      # optimization: only save if there were changes made
       bigip_command:
         commands: save sys config
         provider: "{{ bigip_module_provider }}"

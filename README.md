@@ -2,7 +2,9 @@
 
 This project provides an Ansible playbook to manage SSL certificates on BIG-IP using the F5Networks.F5_Modules.
 
-This is intended for brownfield deployments, hence some non-idempotent patterns are employed.
+![](./docs/images/image.png)
+
+> This is intended for brownfield deployments, hence some non-idempotent patterns are employed.
 
 ## Prerequisites
 
@@ -26,3 +28,9 @@ This is intended for brownfield deployments, hence some non-idempotent patterns 
       ```
       ansible-playbook -i inventory/inventory.ini main.yml
       ```
+
+## Test
+
+```
+openssl s_client -connect <BIG-IP VIP>:443 </dev/null 2>/dev/null | openssl x509 -noout -text | grep DNS:
+```
