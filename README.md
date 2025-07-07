@@ -8,26 +8,34 @@ This project provides an Ansible playbook to manage SSL certificates on BIG-IP u
 
 ## Prerequisites
 
-- Ansible installed on your system.
-- [mkcert](https://github.com/FiloSottile/mkcert) utility installed and configured to generate SSL certificates.
-- [F5Networks.F5_Modules collection](https://galaxy.ansible.com/ui/repo/published/f5networks/f5_modules/) installed.
+- Docker Compose
 - Access to one or more BIG-IP instances with appropriate credentials.
 
 ## Usage
 
-1. Generate SSL certificate and key using mkcert
-      ```
-      cd certs
-      mkcert foo.example.com
-      mkcert bar.example.com
-      ```
-1. Create [certs](./certs) directory in the project root and place your SSL certificate and key files there.
-1. Using [bigip.test](./inventory/host_vars/bigip.test/) as example, create host directories under [inventory/host_vars/](./inventory/host_vars/) with the corresponding variables.
-2. Update [inventory](./inventory/inventory.ini) with the added hosts.
-3. Run the playbook:
-      ```
-      ansible-playbook -i inventory/inventory.ini main.yml
-      ```
+### Generate SSL certificate and key pairs
+
+For every certificate:
+1. create a `<cert_name>.yaml` file in [host_vars](./inventory/certs/host_vars/),
+1. add an entry to the [inventory.ini](./inventory/certs/inventory.ini) file.
+
+Run Ansible playbook to generate SSL certificate and key pairs.
+```
+docker compose run --remove-orphans ansible -i inventory/certs/inventory.ini playbooks/renew-certs.yaml
+```
+
+You should see the key pairs and a `.metadata.yaml` file created the in [.certs](./.certs) directory.
+
+### Load SSL certificate and key pairs to BIG-IP
+
+For every BIG-IP:
+1. create a `<bigip_name>.yaml` file in [host_vars](./inventory/bigip/host_vars/),
+1. add an entry to the [inventory.ini](./inventory/bigip/inventory.ini) file.
+
+Run Ansible playbook to upload the SSL key pair objects and attach them to the corresponding SSL profiles.
+```
+docker compose run --remove-orphans ansible -i inventory/certs/inventory.ini playbooks/renew-certs.yaml
+```
 
 ## Test
 

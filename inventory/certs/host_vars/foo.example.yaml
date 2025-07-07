@@ -1,0 +1,7 @@
+---
+key:
+  type: RSA # DSA/ECC/Ed25519/Ed448/RSA/X25519/X448
+  size: 4096 # only for rsa
+cert:
+  common_name: foo.example.com
+  subject_alternative_names: 'DNS:foo.example.com,IP:1.2.3.4'

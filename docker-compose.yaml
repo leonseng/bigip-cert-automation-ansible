@@ -1,0 +1,10 @@
+# docker compose file to run ansible
+services:
+  ansible:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/home/ansible/ansible/
+    entrypoint:
+      - ansible-playbook

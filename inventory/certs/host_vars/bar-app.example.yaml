@@ -1,0 +1,7 @@
+---
+format: p12 # pem/p12
+key:
+  type: ECC # DSA/ECC/Ed25519/Ed448/RSA/X25519/X448
+cert:
+  common_name: bar.example.com
+  subject_alternative_names: 'DNS:bar.example.com,IP:1.2.3.4'

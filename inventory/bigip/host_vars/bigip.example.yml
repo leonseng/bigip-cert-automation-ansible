@@ -1,0 +1,15 @@
+# BIG-IP host variables
+ansible_host: bigip.example
+ansible_user: admin
+ansible_httpapi_password: password
+ansible_httpapi_port: 443
+ansible_httpapi_use_ssl: yes
+ansible_httpapi_validate_certs: no
+
+# maps Client SSL profiles to corresponding cert objects defined in the certs metadata file
+client_ssl_profiles:
+  ansible-foo.example.com:
+    - foo.example.com
+  ansible-bar.example.com:
+    - bar.example.com
+    - alice.example.com

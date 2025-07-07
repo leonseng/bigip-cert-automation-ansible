@@ -1,0 +1,40 @@
+---
+- name: Attach SSL Certificates to SSL Profiles on BIG-IP
+  hosts: bigip
+  gather_facts: no
+  tasks:
+    - set_fact:
+        object_suffix: "-{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+      when: object_suffix is undefined
+      delegate_to: localhost
+
+    - name: Update SSL profile to use imported key and cert (
+      # using imperative command unless Ansible is used to manage other configurations for client SSL profiles
+      bigip_command:
+        commands: >
+          modify ltm profile client-ssl {{ item.key }}
+          cert-key-chain replace-all-with {
+          {{ lookup('template', '../templates/tmsh-mod-ssl-profile.j2') }}
+          }
+        provider: "{{ bigip_module_provider }}"
+      args:
+        warn: false  # ignore non-idempotent warning
+      loop: "{{ client_ssl_profiles | dict2items }}"
+      delegate_to: localhost
+      register: modify_result
+
+    - name: Check for errors in command output
+      fail:
+        msg: "Error modifying SSL profile {{ item.item.key }}: {{ item.stdout }}"
+      when: item.stdout | length > 0
+      loop: "{{ modify_result.results }}"
+      delegate_to: localhost
+
+    - name: Save changes
+      # optimization: only save if there were changes made
+      bigip_command:
+        commands: save sys config
+        provider: "{{ bigip_module_provider }}"
+      delegate_to: localhost
+      args:
+        warn: false  # ignore non-idempotent warning

@@ -1,0 +1,32 @@
+---
+- name: Upload SSL Certificates to BIG-IP
+  hosts: bigip
+  gather_facts: no
+  tasks:
+    - set_fact:
+        object_suffix: "-{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+      when: object_suffix is undefined
+      delegate_to: localhost
+
+    - name: Import both key and cert
+      f5networks.f5_modules.bigip_ssl_key_cert:
+        key_content: "{{ lookup('file', [certs_local_path, item.value.key] | path_join) }}"
+        key_name: "{{ item.key + object_suffix }}"
+        cert_content: "{{ lookup('file', [certs_local_path, item.value.cert] | path_join) }}"
+        cert_name: "{{ item.key + object_suffix }}"
+        state: present
+        provider: "{{ bigip_module_provider }}"
+      loop: "{{ cert_objects | dict2items | selectattr('value.key', 'defined') }}"
+      loop_control:
+        label: "{{ ansible_host }}-{{ item.key }}"
+      delegate_to: localhost
+
+    - name: Import PKCS#12 bundle
+      f5networks.f5_bigip.bigip_ssl_pkcs12:
+        name: "{{ item.key + object_suffix }}"
+        source: "{{ [certs_local_path, item.value.bundle] | path_join }}"
+        state: present
+      connection: httpapi
+      loop: "{{ cert_objects | dict2items | selectattr('value.bundle', 'defined') }}"
+      loop_control:
+        label: "{{ ansible_host }}-{{ item.key }}"

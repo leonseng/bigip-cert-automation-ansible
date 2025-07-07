@@ -1,0 +1,3 @@
+{% for v in item.value %}
+ {{ cert_objects[v].type }} { cert {{ v }}{{ object_suffix }}{% if cert_objects[v].key is defined %}.crt{% endif %} key {{ v }}{{ object_suffix }}{% if cert_objects[v].key is defined %}.key{% endif %} }
+{%- endfor %}

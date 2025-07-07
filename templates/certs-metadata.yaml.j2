@@ -1,0 +1,12 @@
+cert_objects:
+{% for c in ansible_play_hosts %}
+  {{ c }}:
+    type: {{ hostvars[c].key.type }}
+{% if hostvars[c].key is defined and hostvars[c].cert is defined %}
+    key: {{ c }}/{{ c }}-key.pem
+    cert: {{ c }}/{{ c }}.pem
+{% endif %}
+{% if hostvars[c].bundle is defined %}
+    bundle: {{ c }}/{{ c }}.p12
+{% endif %}
+{%- endfor %}

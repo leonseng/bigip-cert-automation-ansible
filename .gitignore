@@ -1,5 +1,3 @@
-certs/
-inventory/host_vars/*
-!inventory/host_vars/bigip.test
-inventory/*.ini
-!inventory/inventory.ini
+.certs/
+inventory/*/host_vars/*
+!inventory/*/host_vars/*.example.y*ml

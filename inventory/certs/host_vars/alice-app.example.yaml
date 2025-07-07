@@ -1,0 +1,7 @@
+---
+format: pem # pem/p12
+key:
+  type: RSA # RSA/ECC
+cert:
+  common_name: alice.example.com
+  subject_alternative_names: 'DNS:alice.example.com,IP:1.2.3.4'

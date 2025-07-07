@@ -1,0 +1,56 @@
+---
+- name: Regenerate SSL Certificates
+  hosts: certs
+  gather_facts: no
+  tasks:
+    - name: Create directory for each cert
+      ansible.builtin.file:
+        path: "{{ certs_local_path }}/{{ inventory_hostname }}"
+        state: directory
+      delegate_to: localhost
+
+    - name: Generate private key for each cert
+      community.crypto.openssl_privatekey:
+        path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}-key.pem"
+        type: "{{ key.type | default('rsa') }}"
+        size: "{{ key.size | default(4096) }}"
+        curve: "secp256r1"
+      register: privatekey_results
+      delegate_to: localhost
+
+    - name: Generate CSR for each cert
+      community.crypto.openssl_csr:
+        path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}.csr"
+        privatekey_path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}-key.pem"
+        common_name: "{{ cert.common_name }}"
+        subject_alt_name: "{{ cert.subject_alternative_names }}"
+      register: csr_results
+      delegate_to: localhost
+
+    # use openssl to generate a self-signed certificate from the CSR
+    - name: Generate self-signed certificate for each cert
+      community.crypto.x509_certificate:
+        path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}.pem"
+        privatekey_path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}-key.pem"
+        csr_path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}.csr"
+        provider: selfsigned
+        entrust_not_after: "+30d"
+      register: cert_results
+      delegate_to: localhost
+
+    - name: Generate PKCS#12 (PFX) file for each cert if requested
+      community.crypto.openssl_pkcs12:
+        path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}.p12"
+        privatekey_path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}-key.pem"
+        certificate_path: "{{ certs_local_path }}/{{ inventory_hostname }}/{{ inventory_hostname }}.pem"
+        friendly_name: "{{ inventory_hostname }}"
+        passphrase: "{{ passphrase | default('') }}"
+      when: format is defined and format == 'p12'
+      delegate_to: localhost
+
+    - name: Generate cert metadata
+      copy:
+        dest: "{{ certs_local_path }}/.metadata.yaml"
+        content: "{{ lookup('template', '../templates/certs-metadata.yaml.j2') }}"
+      delegate_to: localhost
+      run_once: true
