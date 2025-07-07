@@ -34,7 +34,7 @@ For every BIG-IP:
 
 Run Ansible playbook to upload the SSL key pair objects and attach them to the corresponding SSL profiles.
 ```
-docker compose run --remove-orphans ansible -i inventory/certs/inventory.ini playbooks/renew-certs.yaml
+docker compose run --remove-orphans ansible -i inventory/bigip/inventory.ini --extra-vars "@.certs/.metadata.yaml" -vvv playbooks/bigip-full-run.yaml
 ```
 
 ## Test
